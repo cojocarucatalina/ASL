@@ -56,7 +56,7 @@ with mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) a
                     normalized_x = lm.x - wrist.x
                     normalized_y = lm.y - wrist.y
                     normalized_z = lm.z - wrist.z
-                    landmarks.extend([normalized_x, normalized_y, normalized_z])
+                    landmarks.extend([lm.x, lm.y, lm.z])
 
                 max_abs_value = max(abs(val) for val in landmarks) if landmarks else 1
 
@@ -64,9 +64,9 @@ with mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) a
                 normalized_values = [val / max_abs_value for val in landmarks]
 
                 # Print or use the normalized values
-                for i in range(0, len(normalized_values), 3):
-                    print(
-                        f"Normalized x: {normalized_values[i]:.4f}, y: {normalized_values[i + 1]:.4f}, z: {normalized_values[i + 2]:.4f}")
+                # for i in range(0, len(normalized_values), 3):
+                #     print(
+                #         f"Normalized x: {normalized_values[i]:.4f}, y: {normalized_values[i + 1]:.4f}, z: {normalized_values[i + 2]:.4f}")
 
                 # Index finger (landmark 8)
                 index_finger_tip = hand_landmarks.landmark[8]
