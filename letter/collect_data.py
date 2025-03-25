@@ -23,6 +23,8 @@ with mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) a
             break
 
         height, width, _ = frame.shape
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result = hands.process(rgb_frame)
 
         x_pos = width - x_mark_x - x_mark_size
         y_pos = x_mark_y
@@ -46,29 +48,32 @@ with mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) a
 
                 wrist = hand_landmarks.landmark[0]
 
-                wrist_screen_x = int(wrist.x * width)
-                wrist_screen_y = int(wrist.y * height)
+                x_values = [lm.x for lm in hand_landmarks.landmark]
+                y_values = [lm.y for lm in hand_landmarks.landmark]
+                z_values = [lm.z for lm in hand_landmarks.landmark]
+
+                min_x, max_x = min(x_values), max(x_values)
+                min_y, max_y = min(y_values), max(y_values)
+
+                box_width = max_x - min_x
+                box_height = max_y - min_y
+                max_abs_z = max(abs(z) for z in z_values)
 
                 landmarks = []
-                normalized_values = []
-
                 for lm in hand_landmarks.landmark:
-                    normalized_x = lm.x - wrist.x
-                    normalized_y = lm.y - wrist.y
-                    normalized_z = lm.z - wrist.z
-                    landmarks.extend([lm.x, lm.y, lm.z])
-
-                max_abs_value = max(abs(val) for val in landmarks) if landmarks else 1
-
-                # Normalize the values
-                normalized_values = [val / max_abs_value for val in landmarks]
+                    normalized_x = (lm.x - min_x) / box_width if box_width >0 else 0
+                    normalized_y = (lm.y - min_y) / box_height if box_height >0 else 0
+                    normalized_z = lm.z / max_abs_z if max_abs_z > 0 else 0
+                    landmarks.extend([normalized_x, normalized_y, normalized_z])
 
                 # Print or use the normalized values
                 # for i in range(0, len(normalized_values), 3):
                 #     print(
                 #         f"Normalized x: {normalized_values[i]:.4f}, y: {normalized_values[i + 1]:.4f}, z: {normalized_values[i + 2]:.4f}")
 
+
                 # Index finger (landmark 8)
+
                 index_finger_tip = hand_landmarks.landmark[8]
                 index_finger_tip_position = (int(index_finger_tip.x * width),
                                              int(index_finger_tip.y * height)) # converts the normalized coordinates into pixel coords

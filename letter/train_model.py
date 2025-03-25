@@ -36,6 +36,6 @@ y_test_full = pd.concat(y_test_list, axis=0)
 clf = RandomForestClassifier(n_estimators=100)
 clf.fit(X_train_full, y_train_full)
 
-joblib.dump(clf, 'asl_model.pkl')
+joblib.dump(clf, 'model.pkl')
 
-print("Model trained and saved as 'asl_model.pkl'")
+print("Model trained and saved as 'model.pkl'")
