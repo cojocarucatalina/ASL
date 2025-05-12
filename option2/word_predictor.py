@@ -3,8 +3,10 @@ import mediapipe as mp
 import numpy as np
 import pickle
 import time
+import pyautogui
 
-LETTER_MODEL_PATH = "svm_model.pkl"
+LETTER_MODEL_PATH = "random_forest.pkl"
+# LETTER_MODEL_PATH = "svm_model.pkl"
 with open(LETTER_MODEL_PATH, 'rb') as f:
     letter_model = pickle.load(f)
 
@@ -17,7 +19,10 @@ hands = mp_hands.Hands(min_detection_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
 
 #cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture("videos/rac2.mp4")
+
+
+
+#cap = cv2.VideoCapture("videos/date.mp4")
 
 # fps = cap.get(cv2.CAP_PROP_FPS)
 #
@@ -58,10 +63,15 @@ def predict_word_from_prefix(prefix):
     except:
         return "Unknown"
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+# while cap.isOpened():
+#     ret, frame = cap.read()
+#     if not ret:
+#         break
+
+while True:
+    screenshot = pyautogui.screenshot()
+    frame = np.array(screenshot)
+    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
     frame_resized = cv2.resize(frame, (output_width, output_height))
     landmarks = extract_landmarks(frame_resized)
@@ -78,10 +88,10 @@ while cap.isOpened():
 
     cv2.putText(frame_resized, f"Current Word: {current_word_str}", (50, 200),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-
+    print(f"Current Word: {current_word_str}")
     cv2.putText(frame_resized, f"Predicted Word: {predicted_word}", (50, 300),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
-
+    print(f"Predicted Word: {predicted_word}")
     cv2.imshow("ASL Detection", frame_resized)
 
     key = cv2.waitKey(1) & 0xFF
@@ -92,5 +102,5 @@ while cap.isOpened():
     if key == ord('q'):
         break
 
-cap.release()
+#cap.release()
 cv2.destroyAllWindows()
